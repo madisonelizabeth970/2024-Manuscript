@@ -29,6 +29,7 @@ library(data.table)
 library(Hmisc)
 library(ggpubr)
 library(haven)
+library(tidyr)
 
 ################################################################################
 # 1)                                                                           #
@@ -414,7 +415,153 @@ ggarrange(non.ca.plot, ca.plot,
           ncol = 2, nrow = 1 )
 
 
+################################################################################
+# 5)                                                                           #
+# Descriptive statistics                                                       #
+################################################################################
 
+# 5.1)
+# Create a box plot that shows mean acceptance of evolution disagregated 
+# by religiosity group.
+# (Figure 1 in the manuscript)
+########################################################################
+
+# Reorder the data
+ABT.data.data$religiosity <- factor(ABT.data$religiosity, levels = c("low", "moderate", "high"))
+
+# Create the microevolution plot
+mic.box <- 
+  ggplot(ABT.data, aes(x = religiosity, y = micro, fill = religiosity)) +
+  geom_boxplot() +
+  labs(x = "Religiosity", y = "Microevolution Acceptance") +
+  theme_classic() +
+  theme(
+    axis.title = element_text(face = "bold", size = 14),
+    axis.title.y = element_text(vjust = 2.5),
+    axis.title.x = element_text(vjust = -.6),
+    axis.text.x = element_text(size = 12),
+    legend.position = "none")
+
+# Create the macroevolution plot
+mac.box <-
+  ggplot(ABT.data, aes(x = religiosity, y = macro, fill = religiosity)) +
+  geom_boxplot() +
+  labs(x = "Religiosity", y = "Macroevolution Acceptance") +
+  theme_classic() +
+  theme(
+    axis.title = element_text(face = "bold", size = 14),
+    axis.title.y = element_text(vjust = 2.5),
+    axis.title.x = element_text(vjust = -.6),
+    axis.text.x = element_text(size = 12),
+    legend.position = "none")
+
+# Create the human evolution plot
+hum.box <-
+  ggplot(ABT.data, aes(x = religiosity, y = human, fill = religiosity)) +
+  geom_boxplot() +
+  labs(
+    x = "Religiosity", 
+    y = "Human Evolution Acceptance",
+    fill = "reli") +
+  theme_classic() +
+  theme(
+    axis.title = element_text(face = "bold", size = 14),
+    axis.title.y = element_text(vjust = 2.5),
+    axis.title.x = element_text(vjust = -.6),
+    axis.text.x = element_text(size = 12),
+    legend.position = "none")
+
+# Put all three plots in one figure
+ggarrange(mic.box, mac.box, hum.box,
+          ncol = 3, nrow = 1 )
+
+# 5.2)
+# Religiosity
+############################################
+
+# Mean religiosity of entire sample
+mean(ABT.data$rel)
+# Standard deviation of religiosity in entire sample
+sd(ABT.data$rel)
+
+# Mean religiosity of each religiosity group
+mean(lowrel.data$rel)
+mean(modrel.data$rel)
+mean(highrel.data$rel)
+
+#Standard deviation of religiosity in each religiosity group
+sd(lowrel.data$rel)
+sd(modrel.data$rel)
+sd(highrel.data$rel)
+
+# 5.3)
+# Evolution Acceptance in the whole sample
+############################################
+
+# Mean microevolution acceptance
+mean(ABT.data$micro)
+# Mean macroevolution acceptance
+mean(ABT.data$macro)
+# Mean human evolution acceptance
+mean(ABT.data$human)
+
+# Standard deviation of microevolution acceptance
+sd(ABT.data$micro)
+# Standard deviation of macroevolution acceptance
+sd(ABT.data$macro)
+# Standard deviation of human evolution acceptance
+sd(ABT.data$human)
+
+# 5.4)
+# Evolution Acceptance in each religiosity group
+################################################
+
+# Mean microevolution acceptance in each religiosity group
+mean(lowrel.data$micro)
+mean(modrel.data$micro)
+mean(highrel.data$micro)
+
+# Standard deviation of microevolution acceptance in each religiosity group
+sd(lowrel.data$micro)
+sd(modrel.data$micro)
+sd(highrel.data$micro)
+
+# Mean macroevolution acceptance in each religiosity group
+mean(lowrel.data$macro)
+mean(modrel.data$macro)
+mean(highrel.data$macro)
+
+# Standard deviation of macroevolution acceptance in each religiosity group
+sd(lowrel.data$macro)
+sd(modrel.data$macro)
+sd(highrel.data$macro)
+
+# Human evolution acceptance in each religiosity group
+mean(lowrel.data$human)
+mean(modrel.data$human)
+mean(highrel.data$human)
+
+# Standard deviation of human evolution acceptance in each religiosity group
+sd(lowrel.data$human)
+sd(modrel.data$human)
+sd(highrel.data$human)
+
+# 5.5
+# Create a bar plot that shows acceptance of each macroevolution item
+# (Figure 3 in manuscript)
+#####################################################################
+
+macro.data <- ABT.data[,32:39]
+data.long <- gather(macro.data)
+
+ggplot(data.long, aes(x = key, fill = factor(value))) +
+  geom_bar(position = "fill") +
+  labs(
+    x = "Macroevolution Acceptance Items",
+    y = "Proportion",
+    fill = "Item Responses") +
+  scale_fill_grey(start = 0, end = 0.9) +
+  theme_minimal()
 
 
 
