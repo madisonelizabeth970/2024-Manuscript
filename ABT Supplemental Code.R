@@ -29,7 +29,6 @@ library(data.table)
 library(Hmisc)
 library(ggpubr)
 library(haven)
-library(tidyr)
 
 ################################################################################
 # 1)                                                                           #
@@ -42,19 +41,13 @@ library(tidyr)
 # Simmons et al (2011), participants in courses with less than 20 students     #
 # were removed from the data.                                                  #
 #                                                                              #
-# Provided data shows these reductions and has an n = 11,786   
-
-#
+# Provided data shows these reductions and has an n = 11,786                   #
 ################################################################################
 
-# Load up the data to be used in the analyses:
-# BELOW IS EXAMPLE ONLY TO BE UPDATED LATER
+# Load up the data to be used in the analyses using the file titled "supplemental.data.csv"
+# Make sure to check "yes" for headings.
 ################################################################################
-ABT.data <- read_csv("C:/Users/rqa2a/OneDrive - Middle Tennessee State University/Research - ReCCEE Projects/Rahmi ReCCEE data/ReCCEE Manuscript/Supplemental/23 05 19 ReCCEE quasi data.csv")
-
-# THIS WILL BE DELETED LATER ONCE I FIGURE OUT THE DATA SITUATION
-################################################################################
-ABT.data <- data #(from 23 11 04 code lines 44-52)
+ABT.data <- supplemental.data.test
 
 # Create religiosity category variable
 ################################################################################
@@ -330,16 +323,17 @@ ggarrange(mic.plot, mac.plot, hum.plot,
 # What is the interaction between evolution understanding and raw religiosity
 # scores as predictors of acceptance of the common ancestry macroevolution items
 # and acceptance of the non-common ancestry macroevolution items?
+# (Table 2 in supplemental materials)
 ################################################################################
 
 # Create a new data frame with common ancestry macroevolution items listed 
 # together
-ca.data <- ABT.data[,c(3:6,32:34,36:38,35,39,48)]
+ca.data <- ABT.data[,c(2:9,14:17,40:42,44:46,43,47,66)]
 
 # create new variables: average acceptance of common ancestry related
-# macroevolution itemsand noncommon ancestry 
-ca.data$ca <- rowMeans(ca.data[11:12])
-ca.data$non.ca <- rowMeans(ca.data[5:10])
+# macroevolution items and non common ancestry 
+ca.data$ca <- rowMeans(ca.data[19:20])
+ca.data$non.ca <- rowMeans(ca.data[13:18])
 
 # regressions: test for interaction effects
 ca.mod <- lmer(ca ~ evound * rel + (1|course) + (1|institution), data = ca.data)
@@ -379,6 +373,7 @@ tab_model(highrelSS.ca, highrelSS.non.ca)
 
 # 4.3)
 # Create plots to visualize the simple slope analyses above.
+# (Figure 4 in manuscript)
 ############################################################
 
 # Create regression models using the category version of the religiosity
@@ -415,6 +410,8 @@ ggarrange(non.ca.plot, ca.plot,
           ncol = 2, nrow = 1 )
 
 
+
+
 ################################################################################
 # 5)                                                                           #
 # Descriptive statistics                                                       #
@@ -427,39 +424,45 @@ ggarrange(non.ca.plot, ca.plot,
 ########################################################################
 
 # Reorder the data
-ABT.data.data$religiosity <- factor(ABT.data$religiosity, levels = c("low", "moderate", "high"))
+ABT.data$religiosity <- factor(ABT.data$religiosity, levels = c("low", "moderate", "high"))
 
 # Create the microevolution plot
 mic.box <- 
   ggplot(ABT.data, aes(x = religiosity, y = micro, fill = religiosity)) +
   geom_boxplot() +
-  labs(x = "Religiosity", y = "Microevolution Acceptance") +
+  labs(title = "A",
+       x = "Religiosity", 
+       y = "Microevolution Acceptance",) +
   theme_classic() +
   theme(
     axis.title = element_text(face = "bold", size = 14),
     axis.title.y = element_text(vjust = 2.5),
     axis.title.x = element_text(vjust = -.6),
     axis.text.x = element_text(size = 12),
-    legend.position = "none")
+    legend.position = "none") +
+  scale_fill_grey(start = 0.4, end = 0.9)
 
 # Create the macroevolution plot
 mac.box <-
   ggplot(ABT.data, aes(x = religiosity, y = macro, fill = religiosity)) +
   geom_boxplot() +
-  labs(x = "Religiosity", y = "Macroevolution Acceptance") +
+  labs(title = "B",
+       x = "Religiosity", 
+       y = "Macroevolution Acceptance") +
   theme_classic() +
   theme(
     axis.title = element_text(face = "bold", size = 14),
     axis.title.y = element_text(vjust = 2.5),
     axis.title.x = element_text(vjust = -.6),
     axis.text.x = element_text(size = 12),
-    legend.position = "none")
+    legend.position = "none") +
+  scale_fill_grey(start = 0.4, end = 0.9)
 
 # Create the human evolution plot
 hum.box <-
   ggplot(ABT.data, aes(x = religiosity, y = human, fill = religiosity)) +
   geom_boxplot() +
-  labs(
+  labs(title = "C",
     x = "Religiosity", 
     y = "Human Evolution Acceptance",
     fill = "reli") +
@@ -469,7 +472,8 @@ hum.box <-
     axis.title.y = element_text(vjust = 2.5),
     axis.title.x = element_text(vjust = -.6),
     axis.text.x = element_text(size = 12),
-    legend.position = "none")
+    legend.position = "none") +
+  scale_fill_grey(start = 0.4, end = 0.9)
 
 # Put all three plots in one figure
 ggarrange(mic.box, mac.box, hum.box,
@@ -551,7 +555,7 @@ sd(highrel.data$human)
 # (Figure 3 in manuscript)
 #####################################################################
 
-macro.data <- ABT.data[,32:39]
+macro.data <- ABT.data[,40:47]
 data.long <- gather(macro.data)
 
 ggplot(data.long, aes(x = key, fill = factor(value))) +
